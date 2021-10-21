@@ -80,11 +80,13 @@ let
       rebake = l: builtins.concatStringsSep "." l;
     in
     if (hostConfig != null && hostConfig.networking.domain != null) then
-      rebake (reversePartition hostConfig.networking.domain + [ hostConfig.networking.hostName ])
+      rebake (reversePartition hostConfig.networking.domain + [ hostConfig.networking.
+      ])
     else if hostConfig != null then
       hostConfig.networking.hostName
     # fall back to reverse dns from hostname --fqdn command
-    else "$(IFS='.'; parts=($(hostname --fqdn)); IFS=' '; HOST=$(for (( idx=\${#parts[@]}-1 ; idx>=0 ; idx-- )) ; do printf \"\${parts[idx]}.\"; done); echo \${HOST:: -1})"
+    # use "-f" for BSD (e.g. Darwin)
+    else "$(IFS='.'; parts=($(hostname -f)); IFS=' '; HOST=$(for (( idx=\${#parts[@]}-1 ; idx>=0 ; idx-- )) ; do printf \"\${parts[idx]}.\"; done); echo \${HOST:: -1})"
   ;
 
   flakeRoot =
